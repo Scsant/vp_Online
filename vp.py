@@ -380,10 +380,10 @@ if processar:
         cookies = parse_cookies(cookies_input)
         
         # Captura as informações usando os cookies inseridos
-        capturar_informacoes(cookies)
+        while True:
+            capturar_informacoes(cookies)  # Executa a função principal do seu script
+            time.sleep(120) 
     else:
         st.warning("Por favor, insira os cookies antes de processar a viagem.")
 # Loop infinito para rodar o script a cada 5 minutos
-while True:
-    capturar_informacoes(cookies)  # Executa a função principal do seu script
-    time.sleep(120)        
+       
