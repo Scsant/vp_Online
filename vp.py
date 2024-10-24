@@ -346,18 +346,22 @@ def capturar_informacoes(cookies):
 
 
 
-# Função simulada para capturar informações (substitua com a função real)
+import streamlit as st
+import threading
+import time
+
+# Função simulada para capturar informações (substitua pela função real)
 def capturar_informacoes(cookies):
-    # Aqui você deve colocar a lógica real de captura
-    # Por enquanto, apenas simula a captura de uma placa
+    # Simulação de captura de informações, por exemplo, uma placa
     placa = "ABC-1234"
+    st.write(f"Processando a compra para o veículo com a placa: {placa}")
     return placa
 
 # Função para executar o loop de compras e atualizar a interface
 def executar_em_loop(cookies, placeholder):
     while st.session_state.loop_compras_ativo:
         st.write("Iniciando processo de compra em loop...")
-        placa = capturar_informacoes(cookies)  # Captura a placa atual (ou qualquer informação relevante)
+        placa = capturar_informacoes(cookies)  # Captura a placa ou outras informações relevantes
         placeholder.write(f"Processando compra para o veículo de placa: {placa}")
         st.write("Processo concluído. Aguardando 2 minutos antes da próxima execução.")
         time.sleep(120)  # Aguarda 2 minutos
