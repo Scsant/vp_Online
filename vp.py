@@ -346,64 +346,47 @@ def capturar_informacoes(cookies):
 
 
 
-import streamlit as st
-import threading
-import time
 
-# Função simulada para capturar informações (substitua pela função real)
-def capturar_informacoes(cookies):
-    # Simulação de captura de informações, por exemplo, uma placa
-    placa = "ABC-1234"
-    st.write(f"Processando a compra para o veículo com a placa: {placa}")
-    return placa
 
-# Função para executar o loop de compras e atualizar a interface
-def executar_em_loop(cookies, placeholder):
-    while st.session_state.loop_compras_ativo:
+
+
+# Função para executar o loop de compras
+def executar_em_loop():
+    global loop_compras_ativo
+    while loop_compras_ativo:
         st.write("Iniciando processo de compra em loop...")
-        placa = capturar_informacoes(cookies)  # Captura a placa ou outras informações relevantes
-        placeholder.write(f"Processando compra para o veículo de placa: {placa}")
+        capturar_informacoes(cookies)  # Substitua os cookies por reais
         st.write("Processo concluído. Aguardando 2 minutos antes da próxima execução.")
         time.sleep(120)  # Aguarda 2 minutos
 
-# Função para iniciar o loop
-def iniciar_loop(cookies, placeholder):
-    if not st.session_state.loop_compras_ativo:  # Evita iniciar múltiplas threads
-        st.session_state.loop_compras_ativo = True
-        thread = threading.Thread(target=executar_em_loop, args=(cookies, placeholder))
-        thread.start()
-        st.success("Processo iniciado com sucesso!")
+def iniciar_loop():
+    global loop_compras_ativo
+    loop_compras_ativo = True
+    threading.Thread(target=executar_em_loop).start()
 
-# Função para parar o loop
 def parar_loop():
-    st.session_state.loop_compras_ativo = False
-    st.warning("Processo interrompido!")
-
-# Inicializa as variáveis de estado na primeira execução
-if 'loop_compras_ativo' not in st.session_state:
-    st.session_state.loop_compras_ativo = False
-
+    global loop_compras_ativo
+    loop_compras_ativo = False
 # Interface Streamlit
 st.title("Sistema de Vale Pedágio - Inserir Cookies")
 
 # Caixa de texto para inserir os cookies
 cookies_input = st.text_area("Insira os valores atualizados dos cookies:")
 
-# Placeholder para exibir informações dinâmicas
-placeholder = st.empty()
-
-# Botões para processar e parar
+# Estado do botão para começar e parar o processo
 processar = st.button("Processar Viagem")
 parar = st.button("Parar Execução")
 
 # Verifica se o botão "Processar Viagem" foi pressionado
 if processar:
     if cookies_input:
-        cookies = parse_cookies(cookies_input)  # Converte os cookies para dicionário
-        iniciar_loop(cookies, placeholder)  # Inicia o loop em uma nova thread
+        # Converte a string de cookies para dicionário
+        cookies = parse_cookies(cookies_input)
+        
+        # Captura as informações usando os cookies inseridos
+        while True:
+            capturar_informacoes(cookies)  # Executa a função principal do seu script
+            time.sleep(120) 
     else:
         st.warning("Por favor, insira os cookies antes de processar a viagem.")
-
-# Verifica se o botão "Parar Execução" foi pressionado
-if parar:
-    parar_loop()
+# Loop infinito para rodar o script a cada 5 minutos
