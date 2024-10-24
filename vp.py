@@ -346,20 +346,27 @@ def capturar_informacoes(cookies):
 
 
 
+# Função simulada para capturar informações (substitua com a função real)
+def capturar_informacoes(cookies):
+    # Aqui você deve colocar a lógica real de captura
+    # Por enquanto, apenas simula a captura de uma placa
+    placa = "ABC-1234"
+    return placa
 
-# Função para executar o loop de compras
-def executar_em_loop(cookies):
+# Função para executar o loop de compras e atualizar a interface
+def executar_em_loop(cookies, placeholder):
     while st.session_state.loop_compras_ativo:
         st.write("Iniciando processo de compra em loop...")
-        capturar_informacoes(cookies)  # Substitua por sua função de captura
+        placa = capturar_informacoes(cookies)  # Captura a placa atual (ou qualquer informação relevante)
+        placeholder.write(f"Processando compra para o veículo de placa: {placa}")
         st.write("Processo concluído. Aguardando 2 minutos antes da próxima execução.")
         time.sleep(120)  # Aguarda 2 minutos
 
 # Função para iniciar o loop
-def iniciar_loop(cookies):
+def iniciar_loop(cookies, placeholder):
     if not st.session_state.loop_compras_ativo:  # Evita iniciar múltiplas threads
         st.session_state.loop_compras_ativo = True
-        thread = threading.Thread(target=executar_em_loop, args=(cookies,))
+        thread = threading.Thread(target=executar_em_loop, args=(cookies, placeholder))
         thread.start()
         st.success("Processo iniciado com sucesso!")
 
@@ -378,6 +385,9 @@ st.title("Sistema de Vale Pedágio - Inserir Cookies")
 # Caixa de texto para inserir os cookies
 cookies_input = st.text_area("Insira os valores atualizados dos cookies:")
 
+# Placeholder para exibir informações dinâmicas
+placeholder = st.empty()
+
 # Botões para processar e parar
 processar = st.button("Processar Viagem")
 parar = st.button("Parar Execução")
@@ -386,10 +396,10 @@ parar = st.button("Parar Execução")
 if processar:
     if cookies_input:
         cookies = parse_cookies(cookies_input)  # Converte os cookies para dicionário
-        iniciar_loop(cookies)  # Inicia o loop em uma nova thread
+        iniciar_loop(cookies, placeholder)  # Inicia o loop em uma nova thread
     else:
         st.warning("Por favor, insira os cookies antes de processar a viagem.")
 
 # Verifica se o botão "Parar Execução" foi pressionado
 if parar:
-    parar_loop()   
+    parar_loop()
