@@ -346,44 +346,50 @@ def capturar_informacoes(cookies):
 
 
 
+
 # Função para executar o loop de compras
-def executar_em_loop():
-    global loop_compras_ativo
-    while loop_compras_ativo:
+def executar_em_loop(cookies):
+    while st.session_state.loop_compras_ativo:
         st.write("Iniciando processo de compra em loop...")
-        capturar_informacoes(cookies)  # Substitua os cookies por reais
+        capturar_informacoes(cookies)  # Substitua por sua função de captura
         st.write("Processo concluído. Aguardando 2 minutos antes da próxima execução.")
         time.sleep(120)  # Aguarda 2 minutos
 
-def iniciar_loop():
-    global loop_compras_ativo
-    loop_compras_ativo = True
-    threading.Thread(target=executar_em_loop).start()
+# Função para iniciar o loop
+def iniciar_loop(cookies):
+    if not st.session_state.loop_compras_ativo:  # Evita iniciar múltiplas threads
+        st.session_state.loop_compras_ativo = True
+        thread = threading.Thread(target=executar_em_loop, args=(cookies,))
+        thread.start()
+        st.success("Processo iniciado com sucesso!")
 
+# Função para parar o loop
 def parar_loop():
-    global loop_compras_ativo
-    loop_compras_ativo = False
+    st.session_state.loop_compras_ativo = False
+    st.warning("Processo interrompido!")
+
+# Inicializa as variáveis de estado na primeira execução
+if 'loop_compras_ativo' not in st.session_state:
+    st.session_state.loop_compras_ativo = False
+
 # Interface Streamlit
 st.title("Sistema de Vale Pedágio - Inserir Cookies")
 
 # Caixa de texto para inserir os cookies
 cookies_input = st.text_area("Insira os valores atualizados dos cookies:")
 
-# Estado do botão para começar e parar o processo
+# Botões para processar e parar
 processar = st.button("Processar Viagem")
 parar = st.button("Parar Execução")
 
 # Verifica se o botão "Processar Viagem" foi pressionado
 if processar:
     if cookies_input:
-        # Converte a string de cookies para dicionário
-        cookies = parse_cookies(cookies_input)
-        
-        # Captura as informações usando os cookies inseridos
-        while True:
-            capturar_informacoes(cookies)  # Executa a função principal do seu script
-            time.sleep(120) 
+        cookies = parse_cookies(cookies_input)  # Converte os cookies para dicionário
+        iniciar_loop(cookies)  # Inicia o loop em uma nova thread
     else:
         st.warning("Por favor, insira os cookies antes de processar a viagem.")
-# Loop infinito para rodar o script a cada 5 minutos
-       
+
+# Verifica se o botão "Parar Execução" foi pressionado
+if parar:
+    parar_loop()   
